@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpendWise - Smart Budgeting</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+</head>
+
+<body>
+
+    <aside class="sidebar">
+        <h2>SpendWise</h2>
+        <p>Smart Budgeting</p>
+
+        <nav>
+            <a href="#" class="active">Dashboard</a>
+            <a href="#expenses">Expenses</a>
+            <a href="#budget">Budgets</a>
+            <a href="#">Savings</a>
+            <a href="#">Reports</a>
+        </nav>
+
+        <div class="sidebar-footer">
+            Manage your money wisely.
+        </div>
+    </aside>
+
+    <main class="main-content">
+
+        <header class="page-header">
+            <div>
+                <h1>Dashboard</h1>
+                <p>Welcome to your SpendWise financial dashboard.</p>
+            </div>
+
+            <div class="profile">
+                <div class="avatar">JD</div>
+                <div>
+                    <strong>John Doe</strong>
+                    <small>Budget Manager</small>
+                </div>
+            </div>
+        </header>
+
+        <section class="summary-cards">
+
+            <div class="card">
+                <p>Monthly Budget</p>
+                <h2 id="monthlyBudget">KES 50,000</h2>
+            </div>
+
+            <div class="card">
+                <p>Total Expenses</p>
+                <h2 id="totalExpenses">KES 500</h2>
+            </div>
+
+            <div class="card">
+                <p>Remaining Balance</p>
+                <h2 id="remainingBalance">KES 49,500</h2>
+            </div>
+
+        </section>
+
+        <section class="panel" id="budget">
+
+            <h2>Budget Information</h2>
+            <p>Your budget information is processed using JavaScript.</p>
+
+            <div class="info-grid">
+
+                <div class="info-card">
+                    <span>💰</span>
+                    <div>
+                        <p>Monthly Budget</p>
+                        <h3 id="budgetInfo">KES 50,000</h3>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <span>💳</span>
+                    <div>
+                        <p>Total Spending</p>
+                        <h3 id="spendingInfo">KES 500</h3>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <span>📊</span>
+                    <div>
+                        <p>Balance</p>
+                        <h3 id="balanceInfo">KES 49,500</h3>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section class="panel" id="expenses">
+
+            <h2>Expense Information</h2>
+            <p>Expense information stored by JavaScript.</p>
+
+            <div id="expenseList"></div>
+
+            <button id="addExpenseButton">
+                Update Budget and Add Expense
+            </button>
+
+        </section>
+
+        <section class="panel">
+
+            <h2>Budget Status</h2>
+            <p>JavaScript calculates your remaining balance.</p>
+
+            <div id="budgetStatus" class="status">
+                You have KES 49,500 remaining in your budget.
+            </div>
+
+        </section>
+
+    </main>
+
+</body>
+</html>
