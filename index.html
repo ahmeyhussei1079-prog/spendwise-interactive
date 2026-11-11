@@ -1,127 +1,444 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SpendWise - Smart Budgeting</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="script.js" defer></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SpendWise - Personal Finance Manager</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background: #f1f5f9;
+    color: #1e293b;
+}
+
+header {
+    background: #123c69;
+    color: white;
+    padding: 22px 7%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+header h1 { font-size: 27px; }
+
+nav a {
+    color: white;
+    text-decoration: none;
+    margin-left: 18px;
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 30px auto;
+}
+
+.welcome {
+    margin-bottom: 25px;
+}
+
+.welcome h2 {
+    font-size: 27px;
+    margin-bottom: 8px;
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 18px;
+    margin: 25px 0;
+}
+
+.card {
+    background: white;
+    padding: 23px;
+    border-radius: 12px;
+    box-shadow: 0 3px 12px #00000010;
+}
+
+.card p {
+    color: #64748b;
+    margin-bottom: 12px;
+}
+
+.card h2 {
+    color: #123c69;
+    font-size: 25px;
+}
+
+.section {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    box-shadow: 0 3px 12px #00000010;
+}
+
+.section h2 {
+    margin-bottom: 18px;
+}
+
+form {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+}
+
+input, select, button {
+    padding: 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+    font-size: 15px;
+    width: 100%;
+}
+
+button {
+    background: #123c69;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+button:hover {
+    background: #2563a6;
+}
+
+.budget-form {
+    display: flex;
+    gap: 12px;
+    max-width: 500px;
+}
+
+.budget-form input {
+    flex: 1;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px;
+}
+
+th, td {
+    padding: 14px;
+    border-bottom: 1px solid #e2e8f0;
+    text-align: left;
+}
+
+th {
+    background: #eaf1f8;
+}
+
+.table-wrap {
+    overflow-x: auto;
+}
+
+.delete {
+    background: #dc2626;
+    padding: 8px;
+    width: auto;
+}
+
+.progress {
+    background: #e2e8f0;
+    height: 13px;
+    border-radius: 20px;
+    overflow: hidden;
+    margin-top: 12px;
+}
+
+.progress-bar {
+    background: #16a34a;
+    height: 100%;
+    width: 0%;
+}
+
+footer {
+    background: #123c69;
+    color: white;
+    text-align: center;
+    padding: 22px;
+    margin-top: 40px;
+}
+
+@media(max-width:600px) {
+    header { padding: 20px; }
+    nav a { margin-left: 8px; }
+    .container { width: 94%; }
+    .budget-form { flex-direction: column; }
+}
+</style>
 </head>
 
 <body>
 
-    <aside class="sidebar">
-        <h2>SpendWise</h2>
-        <p>Smart Budgeting</p>
+<header>
+    <h1>💰 SpendWise</h1>
+    <nav>
+        <a href="#dashboard">Dashboard</a>
+        <a href="#expenses">Expenses</a>
+        <a href="#budget">Budget</a>
+    </nav>
+</header>
 
-        <nav>
-            <a href="#" class="active">Dashboard</a>
-            <a href="#expenses">Expenses</a>
-            <a href="#budget">Budgets</a>
-            <a href="#">Savings</a>
-            <a href="#">Reports</a>
-        </nav>
+<div class="container">
 
-        <div class="sidebar-footer">
-            Manage your money wisely.
-        </div>
-    </aside>
+<section class="welcome" id="dashboard">
+    <h2>Personal Finance Dashboard</h2>
+    <p>Manage your money. Track your expenses. Save smarter.</p>
+    <p id="today" style="margin-top:10px;color:#64748b;"></p>
+</section>
 
-    <main class="main-content">
+<h2>Financial Overview</h2>
 
-        <header class="page-header">
-            <div>
-                <h1>Dashboard</h1>
-                <p>Welcome to your SpendWise financial dashboard.</p>
-            </div><p>SpendWise is now live and helping you manage your money!</p>
+<div class="cards">
+    <div class="card">
+        <p>Monthly Budget</p>
+        <h2 id="budgetDisplay">KES 0.00</h2>
+    </div>
 
-            <div class="profile">
-                <div class="avatar">JD</div>
-                <div>
-                    <strong>John Doe</strong>
-                    <small>Budget Manager</small>
-                </div>
-            </div>
-        </header>
+    <div class="card">
+        <p>Total Expenses</p>
+        <h2 id="expenseDisplay">KES 0.00</h2>
+    </div>
 
-        <section class="summary-cards">
+    <div class="card">
+        <p>Remaining Balance</p>
+        <h2 id="remainingDisplay">KES 0.00</h2>
+    </div>
 
-            <div class="card">
-                <p>Monthly Budget</p>
-                <h2 id="monthlyBudget">KES 50,000</h2>
-            </div>
+    <div class="card">
+        <p>Total Savings</p>
+        <h2 id="savingsDisplay">KES 0.00</h2>
+    </div>
+</div>
 
-            <div class="card">
-                <p>Total Expenses</p>
-                <h2 id="totalExpenses">KES 500</h2>
-            </div>
+<section class="section" id="budget">
+    <h2>Set Monthly Budget</h2>
+    <form class="budget-form" id="budgetForm">
+        <input type="number" id="budgetInput"
+        placeholder="Enter budget in KES" min="0.01"
+        step="0.01" required>
+        <button type="submit">Set Budget</button>
+    </form>
 
-            <div class="card">
-                <p>Remaining Balance</p>
-                <h2 id="remainingBalance">KES 49,500</h2>
-            </div>
+    <div class="progress">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+    <p id="budgetMessage" style="margin-top:10px;"></p>
+</section>
 
-        </section>
+<section class="section">
+    <h2>➕ Add New Expense</h2>
 
-        <section class="panel" id="budget">
+    <form id="expenseForm">
+        <input type="text" id="expenseName"
+        placeholder="Expense name" required>
 
-            <h2>Budget Information</h2>
-            <p>Your budget information is processed using JavaScript.</p>
+        <input type="number" id="expenseAmount"
+        placeholder="Amount (KES)" min="0.01"
+        step="0.01" required>
 
-            <div class="info-grid">
+        <select id="expenseCategory" required>
+            <option value="">Select Category</option>
+            <option>Food</option>
+            <option>Transport</option>
+            <option>Housing</option>
+            <option>Utilities</option>
+            <option>Entertainment</option>
+            <option>Education</option>
+            <option>Shopping</option>
+            <option>Health</option>
+            <option>Other</option>
+        </select>
 
-                <div class="info-card">
-                    <span>💰</span>
-                    <div>
-                        <p>Monthly Budget</p>
-                        <h3 id="budgetInfo">KES 50,000</h3>
-                    </div>
-                </div>
+        <input type="date" id="expenseDate" required>
 
-                <div class="info-card">
-                    <span>💳</span>
-                    <div>
-                        <p>Total Spending</p>
-                        <h3 id="spendingInfo">KES 500</h3>
-                    </div>
-                </div>
+        <button type="submit">Add Expense</button>
+    </form>
+</section>
 
-                <div class="info-card">
-                    <span>📊</span>
-                    <div>
-                        <p>Balance</p>
-                        <h3 id="balanceInfo">KES 49,500</h3>
-                    </div>
-                </div>
+<section class="section" id="expenses">
+    <h2>📊 Expense History</h2>
 
-            </div>
-        </section>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Amount</th>
+                    <th>Category</th>
+                    <th>Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="expenseTable">
+            </tbody>
+        </table>
+    </div>
 
-        <section class="panel" id="expenses">
+    <p id="emptyMessage" style="margin-top:15px;color:#64748b;">
+        No expenses yet. Add your first expense above.
+    </p>
+</section>
 
-            <h2>Expense Information</h2>
-            <p>Expense information stored by JavaScript.</p>
+</div>
 
-            <div id="expenseList"></div>
+<footer>
+    <p>© 2026 SpendWise | Manage Your Money Smarter 💙</p>
+</footer>
 
-            <button id="addExpenseButton">
-                Update Budget and Add Expense
-            </button>
+<script>
+let expenses = JSON.parse(localStorage.getItem("spendwiseExpenses")) || [];
+let budget = Number(localStorage.getItem("spendwiseBudget")) || 0;
 
-        </section>
+const money = amount =>
+    "KES " + amount.toLocaleString("en-KE", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
 
-        <section class="panel">
+document.getElementById("today").textContent =
+    new Date().toLocaleDateString("en-KE", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric"
+    });
 
-            <h2>Budget Status</h2>
-            <p>JavaScript calculates your remaining balance.</p>
+document.getElementById("expenseDate").value =
+    new Date().toISOString().slice(0, 10);
 
-            <div id="budgetStatus" class="status">
-                You have KES 49,500 remaining in your budget.
-            </div>
+document.getElementById("budgetForm").addEventListener("submit", function(e) {
+    e.preventDefault();
 
-        </section>
+    const value = Number(document.getElementById("budgetInput").value);
 
-    </main>
+    if (value <= 0) return;
+
+    budget = value;
+    localStorage.setItem("spendwiseBudget", budget);
+
+    this.reset();
+    updateDashboard();
+});
+
+document.getElementById("expenseForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const name = document.getElementById("expenseName").value.trim();
+    const amount = Number(document.getElementById("expenseAmount").value);
+    const category = document.getElementById("expenseCategory").value;
+    const date = document.getElementById("expenseDate").value;
+
+    if (!name || amount <= 0 || !category || !date) return;
+
+    expenses.push({
+        id: Date.now() + Math.random(),
+        name,
+        amount,
+        category,
+        date
+    });
+
+    saveExpenses();
+    this.reset();
+    document.getElementById("expenseDate").value =
+        new Date().toISOString().slice(0, 10);
+});
+
+function saveExpenses() {
+    localStorage.setItem("spendwiseExpenses", JSON.stringify(expenses));
+    updateDashboard();
+}
+
+function deleteExpense(id) {
+    if (!confirm("Delete this expense?")) return;
+
+    expenses = expenses.filter(item => item.id !== id);
+    saveExpenses();
+}
+
+function updateDashboard() {
+    const currentMonth = new Date().toISOString().slice(0, 7);
+
+    const monthlyExpenses = expenses.filter(item =>
+        item.date.slice(0, 7) === currentMonth
+    );
+
+    const total = monthlyExpenses.reduce(
+        (sum, item) => sum + item.amount, 0
+    );
+
+    const remaining = budget - total;
+
+    document.getElementById("budgetDisplay").textContent = money(budget);
+    document.getElementById("expenseDisplay").textContent = money(total);
+    document.getElementById("remainingDisplay").textContent = money(remaining);
+    document.getElementById("savingsDisplay").textContent =
+        money(Math.max(0, remaining));
+
+    const percentage = budget > 0
+        ? Math.min((total / budget) * 100, 100)
+        : 0;
+
+    document.getElementById("progressBar").style.width = percentage + "%";
+
+    document.getElementById("budgetMessage").textContent =
+        budget === 0
+        ? "Set a budget to start tracking your spending."
+        : remaining < 0
+        ? "Warning: You have exceeded your monthly budget!"
+        : "You have used " + percentage.toFixed(1) +
+          "% of your monthly budget.";
+
+    const table = document.getElementById("expenseTable");
+    table.innerHTML = "";
+
+    document.getElementById("emptyMessage").style.display =
+        expenses.length === 0 ? "block" : "none";
+
+    expenses.slice().sort((a,b) =>
+        b.date.localeCompare(a.date)
+    ).forEach(item => {
+        const row = document.createElement("tr");
+
+        [item.name, money(item.amount), item.category, item.date]
+            .forEach(value => {
+                const cell = document.createElement("td");
+                cell.textContent = value;
+                row.appendChild(cell);
+            });
+
+        const actionCell = document.createElement("td");
+        const deleteButton = document.createElement("button");
+
+        deleteButton.textContent = "Delete";
+        deleteButton.className = "delete";
+        deleteButton.addEventListener("click", () =>
+            deleteExpense(item.id)
+        );
+
+        actionCell.appendChild(deleteButton);
+        row.appendChild(actionCell);
+        table.appendChild(row);
+    });
+}
+
+updateDashboard();
+</script>
 
 </body>
 </html>
