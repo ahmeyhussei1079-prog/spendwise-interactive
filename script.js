@@ -1,259 +1,249 @@
-"use strict";
 
-// ========================================
-// 1. STORE APPLICATION DATA
-// ========================================
+// =====================================
+// SPENDWISE - EXPENSE MANAGEMENT SYSTEM
+// =====================================
 
-let monthlyBudget = 50000;
+let expenses = JSON.parse(
+    localStorage.getItem("spendwiseExpenses") || "[]"
+);
 
-let expenses = [
-    {
-        name: "Lunch",
-        category: "Food",
-        amount: 500
-    }
-];
+let budget = Number(
+    localStorage.getItem("spendwiseBudget") || 0
+);
 
-
-// ========================================
-// 2. CALCULATE TOTAL EXPENSES
-// ========================================
-
-function calculateTotalExpenses(expenseList) {
-
-    let total = 0;
-
-    for (let expense of expenseList) {
-        total = total + expense.amount;
-    }
-
-    return total;
+// Format Kenyan currency
+function money(amount) {
+    return "KES " + Number(amount).toLocaleString("en-KE", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
 }
 
-
-// ========================================
-// 3. CALCULATE REMAINING BALANCE
-// ========================================
-
-function calculateRemainingBalance(budget, totalExpenses) {
-
-    return budget - totalExpenses;
+// Get today's local date
+function getToday() {
+    const today = new Date();
+    const offset = today.getTimezoneOffset();
+    return new Date(today.getTime() - offset * 60000)
+        .toISOString().slice(0, 10);
 }
 
+// Display current date
+const todayElement = document.getElementById("today");
 
-// ========================================
-// 4. FORMAT MONEY
-// ========================================
-
-function formatCurrency(amount) {
-
-    return "KES " + amount.toLocaleString("en-KE");
+if (todayElement) {
+    todayElement.textContent = new Date().toLocaleDateString("en-KE", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric"
+    });
 }
 
+// Set default expense date
+const dateInput = document.getElementById("expenseDate");
 
-// ========================================
-// 5. DISPLAY RESULTS
-// ========================================
-
-function displayResults() {
-
-    let totalExpenses = calculateTotalExpenses(expenses);
-
-    let remainingBalance = calculateRemainingBalance(
-        monthlyBudget,
-        totalExpenses
-    );
-
-    // Update dashboard
-
-    document.getElementById("monthlyBudget").textContent =
-        formatCurrency(monthlyBudget);
-
-    document.getElementById("totalExpenses").textContent =
-        formatCurrency(totalExpenses);
-
-    document.getElementById("remainingBalance").textContent =
-        formatCurrency(remainingBalance);
-
-
-    // Update budget information
-
-    document.getElementById("budgetInfo").textContent =
-        formatCurrency(monthlyBudget);
-
-    document.getElementById("spendingInfo").textContent =
-        formatCurrency(totalExpenses);
-
-    document.getElementById("balanceInfo").textContent =
-        formatCurrency(remainingBalance);
-
-
-    // Display expenses
-
-    let expenseList = document.getElementById("expenseList");
-
-    expenseList.innerHTML = "";
-
-    for (let expense of expenses) {
-
-        let expenseItem = document.createElement("div");
-
-        expenseItem.className = "expense-item";
-
-        expenseItem.innerHTML = `
-            <div>
-                <p class="expense-name">${expense.name}</p>
-                <p class="expense-category">${expense.category}</p>
-            </div>
-
-            <span class="expense-amount">
-                ${formatCurrency(expense.amount)}
-            </span>
-        `;
-
-        expenseList.appendChild(expenseItem);
-    }
-
-
-    // Update budget status
-
-    let status = document.getElementById("budgetStatus");
-
-    status.classList.remove("warning", "negative");
-
-    if (remainingBalance < 0) {
-
-        status.textContent =
-            "You have exceeded your budget by " +
-            formatCurrency(Math.abs(remainingBalance));
-
-        status.classList.add("negative");
-
-    } else if (remainingBalance === 0) {
-
-        status.textContent =
-            "Your budget has been fully spent.";
-
-        status.classList.add("warning");
-
-    } else {
-
-        status.textContent =
-            "You have " +
-            formatCurrency(remainingBalance) +
-            " remaining in your budget.";
-    }
-
-
-    // ========================================
-    // 6. DISPLAY RESULTS IN CONSOLE
-    // ========================================
-
-    console.log("========== SPENDWISE BUDGET REPORT ==========");
-    console.log("Monthly Budget:", formatCurrency(monthlyBudget));
-    console.log("Total Expenses:", formatCurrency(totalExpenses));
-    console.log("Remaining Balance:", formatCurrency(remainingBalance));
-    console.log("Expense Details:", expenses);
-    console.log("=============================================");
+if (dateInput && !dateInput.value) {
+    dateInput.value = getToday();
 }
 
-
-// ========================================
-// 7. COLLECT USER INPUT USING PROMPT
-// ========================================
-
-function updateBudgetAndAddExpense() {
-
-    let budgetInput = prompt(
-        "Enter your monthly budget in KES:",
-        monthlyBudget
+// Save expenses
+function saveExpenses() {
+    localStorage.setItem(
+        "spendwiseExpenses",
+        JSON.stringify(expenses)
     );
 
-    if (budgetInput === null) {
+    updateDashboard();
+}
+
+// Save budget
+function saveBudget() {
+    localStorage.setItem("spendwiseBudget", budget);
+    updateDashboard();
+}
+
+// Set monthly budget
+const budgetForm = document.getElementById("budgetForm");
+
+if (budgetForm) {
+    budgetForm.addEventListener("submit", function(event) {
+        event.preventDefault();
+
+        const input = document.getElementById("budgetInput");
+        const newBudget = Number(input.value);
+
+        if (!Number.isFinite(newBudget) || newBudget < 0) {
+            alert("Please enter a valid budget.");
+            return;
+        }
+
+        budget = newBudget;
+        saveBudget();
+        input.value = "";
+
+        alert("Monthly budget updated successfully!");
+    });
+}
+
+// Add new expense
+const expenseForm = document.getElementById("expenseForm");
+
+if (expenseForm) {
+    expenseForm.addEventListener("submit", function(event) {
+        event.preventDefault();
+
+        const name = document.getElementById("expenseName").value.trim();
+        const amount = Number(
+            document.getElementById("expenseAmount").value
+        );
+        const category = document.getElementById("expenseCategory").value;
+        const date = document.getElementById("expenseDate").value;
+
+        if (!name || !Number.isFinite(amount) ||
+            amount <= 0 || !category || !date) {
+            alert("Please complete all expense fields correctly.");
+            return;
+        }
+
+        const newExpense = {
+            id: Date.now() + Math.random(),
+            name: name,
+            amount: amount,
+            category: category,
+            date: date
+        };
+
+        expenses.push(newExpense);
+
+        saveExpenses();
+
+        expenseForm.reset();
+
+        if (dateInput) {
+            dateInput.value = getToday();
+        }
+    });
+}
+
+// Delete an expense
+function deleteExpense(id) {
+    if (!confirm("Are you sure you want to delete this expense?")) {
         return;
     }
 
-    let newBudget = Number(budgetInput);
-
-    if (
-        budgetInput.trim() === "" ||
-        !Number.isFinite(newBudget) ||
-        newBudget < 0
-    ) {
-        alert("Please enter a valid budget.");
-        return;
-    }
-
-
-    let expenseName = prompt("Enter the expense name:");
-
-    if (expenseName === null || expenseName.trim() === "") {
-        alert("Please enter an expense name.");
-        return;
-    }
-
-
-    let expenseInput = prompt(
-        "Enter the expense amount in KES:"
-    );
-
-    if (expenseInput === null) {
-        return;
-    }
-
-    let expenseAmount = Number(expenseInput);
-
-    if (
-        expenseInput.trim() === "" ||
-        !Number.isFinite(expenseAmount) ||
-        expenseAmount < 0
-    ) {
-        alert("Please enter a valid expense amount.");
-        return;
-    }
-
-
-    let category = prompt(
-        "Enter the expense category:",
-        "General"
-    );
-
-    if (category === null || category.trim() === "") {
-        category = "General";
-    }
-
-
-    // Store the new budget
-
-    monthlyBudget = newBudget;
-
-
-    // Store the new expense
-
-    expenses.push({
-        name: expenseName.trim(),
-        category: category.trim(),
-        amount: expenseAmount
+    expenses = expenses.filter(function(expense) {
+        return expense.id !== id;
     });
 
-
-    // Recalculate everything
-
-    displayResults();
+    saveExpenses();
 }
 
+// Update financial dashboard
+function updateDashboard() {
+    const currentMonth = getToday().slice(0, 7);
 
-// ========================================
-// 8. CONNECT BUTTON TO JAVASCRIPT
-// ========================================
+    const monthlyExpenses = expenses.filter(function(expense) {
+        return expense.date.slice(0, 7) === currentMonth;
+    });
 
-document
-    .getElementById("addExpenseButton")
-    .addEventListener("click", updateBudgetAndAddExpense);
+    const totalExpenses = monthlyExpenses.reduce(function(total, expense) {
+        return total + Number(expense.amount);
+    }, 0);
 
+    const remaining = budget - totalExpenses;
+    const savings = Math.max(0, remaining);
 
-// ========================================
-// 9. RUN JAVASCRIPT WHEN PAGE LOADS
-// ========================================
+    document.getElementById("budgetDisplay").textContent =
+        money(budget);
 
-displayResults();
+    document.getElementById("expenseDisplay").textContent =
+        money(totalExpenses);
+
+    document.getElementById("remainingDisplay").textContent =
+        money(remaining);
+
+    document.getElementById("savingsDisplay").textContent =
+        money(savings);
+
+    // Budget progress
+    const percentage = budget > 0
+        ? Math.min((totalExpenses / budget) * 100, 100)
+        : 0;
+
+    const progressBar = document.getElementById("progressBar");
+
+    if (progressBar) {
+        progressBar.style.width = percentage + "%";
+        progressBar.style.background =
+            percentage >= 100 ? "#dc2626" : "#16a34a";
+    }
+
+    // Budget message
+    const message = document.getElementById("budgetMessage");
+
+    if (message) {
+        if (budget === 0) {
+            message.textContent =
+                "Your monthly budget is currently KES 0.00.";
+        } else if (remaining < 0) {
+            message.textContent =
+                "Warning! You have exceeded your monthly budget.";
+        } else {
+            message.textContent =
+                "You have used " + percentage.toFixed(1) +
+                "% of your monthly budget.";
+        }
+    }
+
+    // Display expense history
+    const table = document.getElementById("expenseTable");
+    const emptyMessage = document.getElementById("emptyMessage");
+
+    if (!table) return;
+
+    table.innerHTML = "";
+
+    const sortedExpenses = [...expenses].sort(function(a, b) {
+        return b.date.localeCompare(a.date);
+    });
+
+    if (emptyMessage) {
+        emptyMessage.style.display =
+            expenses.length === 0 ? "block" : "none";
+    }
+
+    sortedExpenses.forEach(function(expense) {
+        const row = document.createElement("tr");
+
+        const values = [
+            expense.name,
+            money(expense.amount),
+            expense.category,
+            expense.date
+        ];
+
+        values.forEach(function(value) {
+            const cell = document.createElement("td");
+            cell.textContent = value;
+            row.appendChild(cell);
+        });
+
+        const actionCell = document.createElement("td");
+        const deleteButton = document.createElement("button");
+
+        deleteButton.textContent = "Delete";
+        deleteButton.className = "delete";
+
+        deleteButton.addEventListener("click", function() {
+            deleteExpense(expense.id);
+        });
+
+        actionCell.appendChild(deleteButton);
+        row.appendChild(actionCell);
+
+        table.appendChild(row);
+    });
+}
+
+// Load dashboard when website opens
+updateDashboard();
